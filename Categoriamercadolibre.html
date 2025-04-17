@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navegación de Categorías</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #navegacion {
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    #navegacion span {
+      color: #007bff;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    #navegacion span:hover {
+      text-decoration: underline;
+    }
+    .categorias {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .categoria {
+      flex: 1 1 calc(33% - 10px); /* Tres categorías por fila */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .categoria:hover {
+      background-color: #eef2ff;
+    }
+    .categoria img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 5px;
+    }
+    .btn {
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      color: #ffffff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    #volver,
+    #inicio {
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    #volver {
+      background-color: #ff6b6b;
+    }
+    #inicio {
+      background-color: #28a745;
+    }
+    #volver:hover {
+      background-color: #d9534f;
+    }
+    #inicio:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Navegación de Categorías</h1>
+    <div id="navegacion">Ubicación actual: <span onclick="volverInicio()">Categorías principales</span></div>
+    <button id="volver" class="btn" onclick="volverAtras()">Volver Atrás</button>
+    <button id="inicio" class="btn" onclick="volverInicio()">Ir a Categorías Madres</button>
+    <div id="categorias" class="categorias"></div>
+  </div>
+
+  <script>
+    const urlCategoriasPadre = "https://api.mercadolibre.com/sites/CBT/categories";
+    const contenedorCategorias = document.getElementById("categorias");
+    const botonVolver = document.getElementById("volver");
+    const botonInicio = document.getElementById("inicio");
+    const rutaNavegacion = document.getElementById("navegacion");
+    let historialCategorias = []; // Guarda las categorías navegadas
+
+    // Mapeo de íconos de ejemplo para las categorías
+    const iconosCategorias = {
+      "Antiques and Collectibles": "https://via.placeholder.com/50?text=Antiques",
+      "Flags": "https://via.placeholder.com/50?text=Flags",
+      "Jewelry": "https://via.placeholder.com/50?text=Jewelry",
+      // Agrega más íconos para otras categorías según lo necesites
+    };
+
+    async function obtenerCategoriasPadre() {
+      try {
+        const respuesta = await fetch(urlCategoriasPadre);
+        if (!respuesta.ok) throw new Error(`Error al obtener categorías: ${respuesta.status}`);
+        const datos = await respuesta.json();
+        historialCategorias = []; // Limpiar historial
+        actualizarRuta("Categorías principales");
+        mostrarCategorias(datos, true);
+        botonVolver.style.display = "none"; // Ocultar el botón "Volver atrás"
+      } catch (error) {
+        contenedorCategorias.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    }
+
+    async function obtenerCategoriasHijas(idCategoria) {
+      const url = `https://api.mercadolibre.com/categories/${idCategoria}`;
+      try {
+        const respuesta = await fetch(url);
+        if (!respuesta.ok) throw new Error(`Error al obtener subcategorías: ${respuesta.status}`);
+        const datos = await respuesta.json();
+        historialCategorias.push({ id: idCategoria, nombre: datos.name });
+
+        actualizarRuta(historialCategorias.map((cat, index) =>
+          `<span onclick="irA(${index})">${cat.nombre}</span>`
+        ).join(" > "));
+
+        if (datos.children_categories.length > 0) {
+          mostrarCategorias(datos.children_categories, false);
+          botonVolver.style.display = "block"; // Mostrar el botón "Volver atrás"
+        } else {
+          contenedorCategorias.innerHTML = `
+            <div class="categoria">
+              <img src="https://via.placeholder.com/50?text=Final" alt="Categoría Final">
+              <div>Categoría Final: ${datos.name}</div>
+              <button class="btn" onclick="copiarTexto('${idCategoria}')">Copiar ID</button>
+            </div>
+          `;
+        }
+      } catch (error) {
+        contenedorCategorias.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    }
+
+    function copiarTexto(texto) {
+      navigator.clipboard.writeText(texto).then(() => {
+        alert(`Texto copiado: ${texto}`);
+      }).catch(err => console.error("Error al copiar texto:", err));
+    }
+
+    function mostrarCategorias(categorias, esPadre) {
+      contenedorCategorias.innerHTML = ""; // Limpia contenido previo
+      categorias.forEach(categoria => {
+        const div = document.createElement("div");
+        const icono = iconosCategorias[categoria.name] || "https://via.placeholder.com/50?text=Generic";
+        div.className = "categoria";
+        div.innerHTML = `
+          <img src="${icono}" alt="${categoria.name}">
+          <div>${categoria.name}</div>
+          <button class="btn" onclick="event.stopPropagation(); copiarTexto('${categoria.id}')">Copiar ID</button>
+        `;
+        div.onclick = () => obtenerCategoriasHijas(categoria.id);
+        contenedorCategorias.appendChild(div);
+      });
+    }
+
+    function volverAtras() {
+      if (historialCategorias.length > 1) {
+        historialCategorias.pop();
+        const categoriaAnterior = historialCategorias[historialCategorias.length - 1];
+        actualizarRuta(historialCategorias.map((cat, index) =>
+          `<span onclick="irA(${index})">${cat.nombre}</span>`
+        ).join(" > "));
+        obtenerCategoriasHijas(categoriaAnterior.id);
+      } else {
+        botonVolver.style.display = "none";
+        obtenerCategoriasPadre();
+      }
+    }
+
+    function volverInicio() {
+      obtenerCategoriasPadre(); // Regresa directamente a las categorías principales
+    }
+
+    function irA(indice) {
+      historialCategorias = historialCategorias.slice(0, indice + 1); // Recorta el historial
+      const categoriaSeleccionada = historialCategorias[indice];
+      actualizarRuta(historialCategorias.map((cat, index) =>
+        `<span onclick="irA(${index})">${cat.nombre}</span>`
+      ).join(" > "));
+      obtenerCategoriasHijas(categoriaSeleccionada.id); // Muestra la categoría seleccionada
+    }
+
+    function actualizarRuta(ruta) {
+      rutaNavegacion.innerHTML = `Ubicación actual: ${ruta}`;
+    }
+
+    obtenerCategoriasPadre();
+  </script>
+</body>
+</html>
