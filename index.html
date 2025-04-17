@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
       padding: 0;
       background-color: #f4f4f9;
     }
+
     .container {
       max-width: 800px;
       margin: 20px auto;
@@ -19,12 +21,14 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       border-radius: 8px;
     }
+
     h1 {
       font-size: 1.5rem;
       text-align: center;
       color: #333;
       margin-bottom: 20px;
     }
+
     #navegacion {
       font-size: 0.9rem;
       margin-bottom: 15px;
@@ -33,22 +37,27 @@
       border-radius: 5px;
       background-color: #f9f9f9;
     }
+
     #navegacion span {
       color: #007bff;
       cursor: pointer;
       margin-right: 5px;
     }
+
     #navegacion span:hover {
       text-decoration: underline;
     }
+
     .categorias {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
     }
+
     .categoria {
-      flex: 1 1 calc(33% - 10px); /* Tres categorías por fila */
+      flex: 1 1 calc(33% - 10px);
+      /* Tres categorías por fila */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -60,14 +69,17 @@
       box-sizing: border-box;
       text-align: center;
     }
+
     .categoria:hover {
       background-color: #eef2ff;
     }
+
     .categoria img {
       width: 50px;
       height: 50px;
       margin-bottom: 5px;
     }
+
     .btn {
       font-size: 0.8rem;
       padding: 5px 10px;
@@ -77,29 +89,36 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     .btn:hover {
       background-color: #0056b3;
     }
+
     #volver,
     #inicio {
       margin-bottom: 15px;
       font-size: 0.9rem;
       width: 100%;
     }
+
     #volver {
       background-color: #ff6b6b;
     }
+
     #inicio {
       background-color: #28a745;
     }
+
     #volver:hover {
       background-color: #d9534f;
     }
+
     #inicio:hover {
       background-color: #218838;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Navegación de Categorías</h1>
@@ -119,9 +138,9 @@
 
     // Mapeo de íconos de ejemplo para las categorías
     const iconosCategorias = {
-      "Antiques and Collectibles": "https://via.placeholder.com/50?text=Antiques",
-      "Flags": "https://via.placeholder.com/50?text=Flags",
-      "Jewelry": "https://via.placeholder.com/50?text=Jewelry",
+      "Antiques and Collectibles": "https://dummyimage.com/50x50/000/fff&text=Antiques",
+      "Flags": "https://dummyimage.com/50x50/000/fff&text=Flags",
+      "Jewelry": "https://dummyimage.com/50x50/000/fff&text=Jewelry",
       // Agrega más íconos para otras categorías según lo necesites
     };
 
@@ -157,7 +176,7 @@
         } else {
           contenedorCategorias.innerHTML = `
             <div class="categoria">
-              <img src="https://via.placeholder.com/50?text=Final" alt="Categoría Final">
+              <img src="https://dummyimage.com/50x50/000/fff&text=Final" alt="Categoría Final">
               <div>Categoría Final: ${datos.name}</div>
               <button class="btn" onclick="copiarTexto('${idCategoria}')">Copiar ID</button>
             </div>
@@ -178,7 +197,7 @@
       contenedorCategorias.innerHTML = ""; // Limpia contenido previo
       categorias.forEach(categoria => {
         const div = document.createElement("div");
-        const icono = iconosCategorias[categoria.name] || "https://via.placeholder.com/50?text=Generic";
+        const icono = iconosCategorias[categoria.name] || "https://dummyimage.com/50x50/000/fff&text=Generic";
         div.className = "categoria";
         div.innerHTML = `
           <img src="${icono}" alt="${categoria.name}">
@@ -224,4 +243,5 @@
     obtenerCategoriasPadre();
   </script>
 </body>
+
 </html>
