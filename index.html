@@ -197,7 +197,7 @@
       contenedorCategorias.innerHTML = ""; // Limpia contenido previo
       categorias.forEach(categoria => {
         const div = document.createElement("div");
-        const icono = iconosCategorias[categoria.name] || "https://dummyimage.com/50x50/fff/000&text=Generic";
+        const icono = categoria?.picture || "https://dummyimage.com/50x50/fff/000&text=Generic";
         div.className = "categoria";
         div.innerHTML = `
           <img src="${icono}" alt="${categoria.name}">
